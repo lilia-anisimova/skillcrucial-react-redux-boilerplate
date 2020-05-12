@@ -26,6 +26,12 @@ server.use(bodyParser.json({ limit: '50mb', extended: true }))
 
 server.use(cookieParser())
 
+// Adding headers
+express().use('/*', (req, res) => {
+  res.set('x-skillcrucial-user', '9465eaa4-071c-4ea3-a592-b54c6deb3f7f')
+  res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')
+})
+
 const saveToUsersFile = (text) => {
   writeFile(`${__dirname}/users.json`, text, { encoding: 'utf8' })
 }
