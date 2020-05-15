@@ -63,8 +63,8 @@ server.get('/api/v1/users/', async (req, res) => {
   .then(text => {
     res.json(JSON.parse(text))
   })  
-  .catch(() => {
-    const { data: users } = axios('https://jsonplaceholder.typicode.com/users')
+  .catch(async () => {
+    const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
     saveFile(JSON.stringify(users))
     res.json(users)
   })
