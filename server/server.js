@@ -59,9 +59,15 @@ server.use(cookieParser())
 server.use(setHeaders)
 
 server.get('/api/v1/users/', async (req, res) => {
-  const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')	  
-  saveFile(JSON.stringify(users))	
-  res.json(users)
+  await readFile(`${__dirname}/users.json`, { encoding: "utf8" })  
+  .then(text => {
+    res.json(JSON.parse(text))
+  })  
+  .catch(() => {
+    const { data: users } = axios('https://jsonplaceholder.typicode.com/users')
+    saveFile(JSON.stringify(users))
+    res.json(users)
+  })
 })
 
 server.post('/api/v1/users/', async (req, res) => {
@@ -69,7 +75,7 @@ server.post('/api/v1/users/', async (req, res) => {
   const newUserBody = req.body
   const userLength = users[users.length - 1].id
   newUserBody.id = userLength + 1
-  const newUser = [... users, newUserBody]
+  const newUser = [...users, newUserBody]
   saveFile(newUser)
   res.json({ status: 'success', id: newUserBody.id })
 })
@@ -86,13 +92,13 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
 server.delete('/api/v1/users/:userId', async (req, res) => {
   const users = await fileRead()
   const { userId } = req.params
-  const otherUsers = users.filter(u => u.id !== Number(userId))
+  const otherUsers = users.filter((u) => u.id !== Number(userId))
   saveFile(JSON.stringify(otherUsers))
   res.json({ status: 'success', id: userId })
 })
 
 server.delete('/api/v1/users/', async (req, res) => {
-  unlink(`${__dirname}/users.json`) 
+  unlink(`${__dirname}/users.json`)
   res.json()
 })
 
