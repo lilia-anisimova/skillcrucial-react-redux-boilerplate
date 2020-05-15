@@ -73,7 +73,7 @@ server.get('/api/v1/users/', async (req, res) => {
 server.post('/api/v1/users/', async (req, res) => {
   const users = await fileRead()
   const newUserBody = req.body
-  const userLength = users[users.length - 1].id
+  const userLength = users.length === 0 ? 0 : users[users.length - 1].id
   newUserBody.id = userLength + 1
   const newUser = [...users, newUserBody]
   await saveFile(newUser)
@@ -94,7 +94,7 @@ server.delete('/api/v1/users/:userId', async (req, res) => {
   const { userId } = req.params
   const otherUsers = users.filter((u) => u.id !== Number(userId))
   await saveFile(JSON.stringify(otherUsers))
-  res.json({ "status": "Success", id: userId })
+  res.json({ status: 'success', id: userId })
 })
 
 server.delete('/api/v1/users/', async (req, res) => {
