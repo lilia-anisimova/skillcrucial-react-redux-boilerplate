@@ -22,6 +22,20 @@ const setHeaders = (req, res, next) => {
   return next()
 }
 
+const saveToUsersFile = async (users) => {
+  return writeFile(`${__dirname}/users.json`, JSON.stringify(users), { encoding: 'utf8' })
+}
+
+const fileRead = async() => {
+  return readFile(`${__dirname}/users.json`, { encoding: "utf8" })
+  .then((data) => JSON.parse(data))
+  .catch(async () => {
+    const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
+    await saveToUsersFile(users)
+    return users 
+  })
+}
+
 let connections = []
 
 const port = process.env.PORT || 3000
@@ -36,21 +50,6 @@ server.use(bodyParser.json({ limit: '50mb', extended: true }))
 server.use(cookieParser())
 
 server.use(setHeaders)
-
-
-const saveToUsersFile = async (users) => {
-  return writeFile(`${__dirname}/users.json`, JSON.stringify(users), { encoding: 'utf8' })
-}
-
-const fileRead = async() => {
-  return readFile(`${__dirname}/users.json`, { encoding: "utf8" })
-  .then((data) => JSON.parse(data))
-  .catch(async () => {
-    const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
-    await saveToUsersFile(users)
-    return users 
-  })
-}
 
 server.get('/api/v1/users/', async (req, res) => {
   const users = await fileRead()
@@ -81,13 +80,14 @@ server.delete('/api/v1/users/', async (req, res) => {
   const { userId } = req.params
   users.splice(Number(userId) - 1, 1)
   saveToUsersFile(users)
-  res.json({ status: 'success', id: userId })
+  res.json({ status: 'success', id: Number(userId) })
 })
 
 server.delete('/api/v1/users/', async (req, res) => {
   unlink(`${__dirname}/users.json`) 
   res.json()
 })
+
 server.use('/api/', (req, res) => {
   res.status(404)
   res.end()
