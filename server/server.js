@@ -56,6 +56,8 @@ server.use(bodyParser.json({ limit: '50mb', extended: true }))
 
 server.use(cookieParser())
 
+server.use(setHeaders)
+
 server.get('/api/v1/users/', async (req, res) => {
   const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')	  
   saveFile(JSON.stringify(users))	
@@ -93,8 +95,6 @@ server.delete('/api/v1/users/', async (req, res) => {
   unlink(`${__dirname}/users.json`) 
   res.json()
 })
-
-server.use(setHeaders)
 
 server.use('/api/', (req, res) => {
   res.status(404)
