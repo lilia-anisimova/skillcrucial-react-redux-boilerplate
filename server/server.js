@@ -22,7 +22,7 @@ const { readFile, writeFile, unlink } = require('fs').promises
 //   res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')	
 // })
 
-const saveToUsersFile = (text) => {
+const saveFile = (text) => {
   writeFile(`${__dirname}/users.json`, text, { encoding: 'utf8' })
 }
 
@@ -31,7 +31,7 @@ const fileRead = async() => {
   .then((data) => JSON.parse(data))
   .catch(async () => {
     const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
-    await saveToUsersFile(users)
+    await saveFile(users)
     return users 
   })
 }
@@ -58,7 +58,7 @@ server.use(cookieParser())
 
 server.get('/api/v1/users/', async (req, res) => {
   const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')	  
-  saveToUsersFile(JSON.stringify(users))	
+  saveFile(JSON.stringify(users))	
   res.json(users)
 })
 
@@ -68,7 +68,7 @@ server.post('/api/v1/users/', async (req, res) => {
   const userLength = users[users.length - 1].id
   newUserBody.id = userLength + 1
   const newUser = [... users, newUserBody]
-  saveToUsersFile(newUser)
+  saveFile(newUser)
   res.json({ status: 'success', id: newUserBody.id })
 })
 
@@ -77,7 +77,7 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
   const { userId } = req.params
   const newUserBody = req.body
   const newUsersArray = users.map((it) => (it.id === +userId ? Object.assign(it, newUserBody) : it))
-  saveToUsersFile(newUsersArray)
+  saveFile(newUsersArray)
   res.json({ status: 'success', id: userId })
 })
 
@@ -85,7 +85,7 @@ server.delete('/api/v1/users/', async (req, res) => {
   const users = await fileRead()
   const { userId } = req.params
   users.splice(Number(userId) - 1, 1)
-  saveToUsersFile(users)
+  saveFile(users)
   res.json({ status: 'success', id: Number(userId) })
 })
 
