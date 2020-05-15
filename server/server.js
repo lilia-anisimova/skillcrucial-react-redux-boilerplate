@@ -81,7 +81,7 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
   res.json({ status: 'success', id: userId })
 })
 
-server.delete('/api/v1/users/', async (req, res) => {
+server.delete('/api/v1/users/:userId', async (req, res) => {
   const users = await fileRead()
   const { userId } = req.params
   users.splice(Number(userId) - 1, 1)
