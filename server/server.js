@@ -88,7 +88,7 @@ server.delete('/api/v1/users/:userId', async (req, res) => {
   const { userId } = req.params
   const otherUsers = users.filter(u => u.id !== Number(userId))
   saveFile(JSON.stringify(otherUsers))
-  res.json({ status: 'success', id: Number(userId) })
+  res.json({ status: 'success', id: userId })
 })
 
 server.delete('/api/v1/users/', async (req, res) => {
