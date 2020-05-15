@@ -12,18 +12,18 @@ import cookieParser from 'cookie-parser'
 import Html from '../client/html'
 
 
-// TODO: Add remaining functions
+// TODO: Add remaining functions - unlink!!!!
+// const { readFile, writeFile, unlink } = require('fs').promises
 const { readFile, writeFile, unlink } = require('fs').promises
 
-// Adding headers
-const setHeaders = (req, res, next) => {
-  res.set('x-skillcrucial-user', '9465eaa4-071c-4ea3-a592-b54c6deb3f7f')
-  res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')
-  return next()
-}
+// Adding headers	server.use(setHeaders)
+express().use('/*', (req, res) => {	
+  res.set('x-skillcrucial-user', '9465eaa4-071c-4ea3-a592-b54c6deb3f7f')	
+  res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')	
+})
 
-const saveToUsersFile = async (users) => {
-  return writeFile(`${__dirname}/users.json`, JSON.stringify(users), { encoding: 'utf8' })
+const saveToUsersFile = (text) => {
+  writeFile(`${__dirname}/users.json`, text, { encoding: 'utf8' })
 }
 
 const fileRead = async() => {
@@ -35,6 +35,27 @@ const fileRead = async() => {
     return users 
   })
 }
+
+// Adding headers
+// const setHeaders = (req, res, next) => {
+//   res.set('x-skillcrucial-user', '9465eaa4-071c-4ea3-a592-b54c6deb3f7f')
+//   res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')
+//   return next()
+// }
+
+// const saveToUsersFile = async (users) => {
+//   return writeFile(`${__dirname}/users.json`, JSON.stringify(users), { encoding: 'utf8' })
+// }
+
+// const fileRead = async() => {
+//   return readFile(`${__dirname}/users.json`, { encoding: "utf8" })
+//   .then((data) => JSON.parse(data))
+//   .catch(async () => {
+//     const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
+//     await saveToUsersFile(users)
+//     return users 
+//   })
+// }
 
 let connections = []
 
@@ -49,10 +70,9 @@ server.use(bodyParser.json({ limit: '50mb', extended: true }))
 
 server.use(cookieParser())
 
-server.use(setHeaders)
-
 server.get('/api/v1/users/', async (req, res) => {
-  const users = await fileRead()
+  const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')	  
+  saveToUsersFile(JSON.stringify(users))	
   res.json(users)
 })
 
@@ -87,6 +107,45 @@ server.delete('/api/v1/users/', async (req, res) => {
   unlink(`${__dirname}/users.json`) 
   res.json()
 })
+
+// server.use(setHeaders)
+
+// server.get('/api/v1/users/', async (req, res) => {
+//   const users = await fileRead()
+//   res.json(users)
+// })
+
+// server.post('/api/v1/users/', async (req, res) => {
+//   const users = await fileRead()
+//   const newUserBody = req.body
+//   const userLength = users[users.length - 1].id
+//   newUserBody.id = userLength + 1
+//   const newUser = [... users, newUserBody]
+//   saveToUsersFile(newUser)
+//   res.json({ status: 'success', id: newUserBody.id })
+// })
+
+// server.patch('/api/v1/users/:userId', async (req, res) => {
+//   const users = await fileRead()
+//   const { userId } = req.params
+//   const newUserBody = req.body
+//   const newUsersArray = users.map((it) => (it.id === +userId ? Object.assign(it, newUserBody) : it))
+//   saveToUsersFile(newUsersArray)
+//   res.json({ status: 'success', id: userId })
+// })
+
+// server.delete('/api/v1/users/', async (req, res) => {
+//   const users = await fileRead()
+//   const { userId } = req.params
+//   users.splice(Number(userId) - 1, 1)
+//   saveToUsersFile(users)
+//   res.json({ status: 'success', id: Number(userId) })
+// })
+
+// server.delete('/api/v1/users/', async (req, res) => {
+//   unlink(`${__dirname}/users.json`) 
+//   res.json()
+// })
 
 server.use('/api/', (req, res) => {
   res.status(404)
