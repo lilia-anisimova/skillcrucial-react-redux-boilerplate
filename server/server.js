@@ -84,8 +84,8 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
 server.delete('/api/v1/users/:userId', async (req, res) => {
   const users = await fileRead()
   const { userId } = req.params
-  users.splice(Number(userId) - 1, 1)
-  saveFile(users)
+  const otherUsers = users.filter(u => u.id !== Number(userId))
+  saveFile(JSON.stringify(otherUsers))
   res.json({ status: 'success', id: Number(userId) })
 })
 
