@@ -76,7 +76,7 @@ server.post('/api/v1/users/', async (req, res) => {
   const userLength = users.length === 0 ? 0 : users[users.length - 1].id
   newUserBody.id = userLength + 1
   const newUser = [...users, newUserBody]
-  await saveFile(newUser)
+  await saveFile(JSON.stringify(newUser))
   res.json({ status: 'success', id: newUserBody.id })
 })
 
@@ -84,8 +84,8 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
   const users = await fileRead()
   const { userId } = req.params
   const newUserBody = req.body
-  const newUsersArray = users.map((it) => (it.id === +userId ? Object.assign(it, newUserBody) : it))
-  await saveFile(newUsersArray)
+  const newUsersArray = users.map((it) => (it.id === Number(userId) ? Object.assign(it, newUserBody) : it))
+  await saveFile(JSON.stringify(newUsersArray))
   res.json({ status: 'success', id: userId })
 })
 
