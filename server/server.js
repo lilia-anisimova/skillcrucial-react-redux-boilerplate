@@ -76,7 +76,7 @@ server.post('/api/v1/users/', async (req, res) => {
   const userLength = users[users.length - 1].id
   newUserBody.id = userLength + 1
   const newUser = [...users, newUserBody]
-  saveFile(newUser)
+  await saveFile(newUser)
   res.json({ status: 'success', id: newUserBody.id })
 })
 
@@ -85,7 +85,7 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
   const { userId } = req.params
   const newUserBody = req.body
   const newUsersArray = users.map((it) => (it.id === +userId ? Object.assign(it, newUserBody) : it))
-  saveFile(newUsersArray)
+  await saveFile(newUsersArray)
   res.json({ status: 'success', id: userId })
 })
 
@@ -93,8 +93,8 @@ server.delete('/api/v1/users/:userId', async (req, res) => {
   const users = await fileRead()
   const { userId } = req.params
   const otherUsers = users.filter((u) => u.id !== Number(userId))
-  saveFile(JSON.stringify(otherUsers))
-  res.json({ status: 'success', id: userId })
+  await saveFile(JSON.stringify(otherUsers))
+  res.json({ "status": "Success", id: userId })
 })
 
 server.delete('/api/v1/users/', async (req, res) => {
